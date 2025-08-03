@@ -25,6 +25,9 @@ A collaborative data modeling and spreadsheet user interface application built w
 - **셀 포맷팅**: 다양한 데이터 타입별 시각화
 - **컬럼 관리**: 동적 컬럼 추가/제거/재정렬
 
+![Database Table Grid](docs/images/database-table-grid.png)
+*PostgreSQL 스타일의 메타데이터가 포함된 테이블 그리드 컴포넌트*
+
 ### 🎮 **UI/UX 데모 (테트리스)**  
 WebAssembly 성능 및 UI 반응성 시연
 - **실시간 렌더링**: 60fps 게임 루프 구현
