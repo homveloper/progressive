@@ -1,0 +1,417 @@
+/* =============================================================================
+   3D Qube Game Styles
+   ============================================================================= */
+
+.qube-game-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  min-height: 100vh;
+  color: #333;
+  outline: none; /* Remove focus outline */
+}
+
+.game-title {
+  text-align: center;
+  color: white;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.game-layout-3d {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* =============================================================================
+   3D Canvas Styles
+   ============================================================================= */
+
+.canvas-container {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  backdrop-filter: blur(10px);
+  position: relative;
+}
+
+.canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+.game-canvas-3d {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.game-canvas-3d:focus {
+  outline: none;
+}
+
+.canvas-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 1.2rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* =============================================================================
+   Side Panel Styles
+   ============================================================================= */
+
+.side-panel-3d {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.game-stats-3d,
+.game-hud-3d,
+.game-controls-3d {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  backdrop-filter: blur(10px);
+}
+
+.game-stats-3d h3,
+.game-hud-3d h3,
+.game-controls-3d h4 {
+  margin: 0 0 15px 0;
+  color: #2d3748;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+/* =============================================================================
+   Stats Styles
+   ============================================================================= */
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.stat-value {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #2b6cb0;
+  font-family: 'Courier New', monospace;
+}
+
+.pause-indicator {
+  background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+  border: 2px solid #fc8181;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+  color: #c53030;
+  animation: pulse 2s infinite;
+}
+
+/* =============================================================================
+   Control Button Styles
+   ============================================================================= */
+
+.control-buttons-3d {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.control-button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.pause-button {
+  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+  color: white;
+}
+
+.pause-button:hover {
+  background: linear-gradient(135deg, #dd6b20 0%, #c05621 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(221, 107, 32, 0.4);
+}
+
+.restart-button {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+  color: white;
+}
+
+.restart-button:hover {
+  background: linear-gradient(135deg, #c53030 0%, #9c2626 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(197, 48, 48, 0.4);
+}
+
+.debug-button {
+  background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+  color: white;
+  border: 2px solid #6b46c1;
+}
+
+.debug-button:hover {
+  background: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+/* =============================================================================
+   Controls Help Styles
+   ============================================================================= */
+
+.control-item {
+  padding: 8px 0;
+  color: #4a5568;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+
+.control-item:last-child {
+  border-bottom: none;
+}
+
+.help-separator {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 15px 0;
+}
+
+/* =============================================================================
+   Game Over Styles
+   ============================================================================= */
+
+.game-over-3d {
+  background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+  border: 2px solid #fc8181;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 20px;
+  animation: pulse 2s infinite;
+}
+
+.game-over-3d h2 {
+  color: #c53030;
+  margin: 0 0 10px 0;
+  font-size: 1.5rem;
+}
+
+.game-over-3d p {
+  color: #742a2a;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* =============================================================================
+   Responsive Design
+   ============================================================================= */
+
+@media (max-width: 1200px) {
+  .game-layout-3d {
+    flex-direction: column;
+  }
+  
+  .side-panel-3d {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .game-stats-3d,
+  .game-hud-3d,
+  .game-controls-3d {
+    flex: 1;
+    min-width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .qube-game-container {
+    padding: 10px;
+  }
+  
+  .game-title {
+    font-size: 2rem;
+  }
+  
+  .canvas-wrapper {
+    height: 400px;
+  }
+  
+  .side-panel-3d {
+    flex-direction: column;
+  }
+  
+  .game-stats-3d,
+  .game-hud-3d,
+  .game-controls-3d {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .canvas-wrapper {
+    height: 300px;
+  }
+  
+  .control-buttons-3d {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .control-button {
+    flex: 1;
+    min-width: 120px;
+  }
+}
+
+/* =============================================================================
+   Animations and Effects
+   ============================================================================= */
+
+.qube-game-container {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Button Glow Effect */
+.control-button:not(:disabled):hover {
+  animation: buttonGlow 0.3s ease forwards;
+}
+
+@keyframes buttonGlow {
+  to {
+    box-shadow: 0 0 20px rgba(66, 153, 225, 0.6);
+  }
+}
+
+/* Canvas Focus Effect */
+.game-canvas-3d:hover {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Loading Effect */
+.canvas-loading {
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* 3D Perspective Effects */
+.canvas-container {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.canvas-container:hover {
+  transform: perspective(1000px) rotateX(1deg) rotateY(1deg);
+  transition: transform 0.3s ease;
+}
+
+/* Performance Optimized Styles */
+.game-canvas-3d,
+.stat-value,
+.control-button {
+  will-change: transform;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .qube-game-container {
+    background: linear-gradient(135deg, #0f1419 0%, #1a202c 100%);
+  }
+  
+  .game-stats-3d,
+  .game-hud-3d,
+  .game-controls-3d {
+    background: rgba(26, 32, 44, 0.95);
+    color: #e2e8f0;
+  }
+  
+  .game-stats-3d h3,
+  .game-hud-3d h3,
+  .game-controls-3d h4 {
+    color: #e2e8f0;
+    border-bottom-color: #4a5568;
+  }
+  
+  .stat-label,
+  .control-item {
+    color: #a0aec0;
+  }
+}
