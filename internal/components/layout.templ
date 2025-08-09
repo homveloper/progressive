@@ -1,8 +1,9 @@
 package components
 
-templ Layout(title string) {
+// Base Layout without sidebar (for landing, login pages)
+templ BaseLayout(title string) {
 	<!DOCTYPE html>
-	<html lang="en">
+	<html lang="ko">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -12,19 +13,66 @@ templ Layout(title string) {
 			<script src="https://unpkg.com/htmx.org@2.0.0/dist/ext/ws.js"></script>
 		</head>
 		<body class="bg-gray-50">
-			<nav class="bg-white shadow-sm mb-8">
-				<div class="container mx-auto px-4 py-4">
-					<a href="/" class="text-2xl font-bold text-blue-600">Progressive</a>
-				</div>
-			</nav>
-			
-			<main>
-				{ children... }
-			</main>
-			
-			<footer class="mt-16 py-8 text-center text-gray-500">
-				<p>&copy; 2024 Progressive. All rights reserved.</p>
-			</footer>
+			{ children... }
 		</body>
 	</html>
+}
+
+// App Layout with sidebar (for authenticated pages)
+templ AppLayout(title string) {
+	<!DOCTYPE html>
+	<html lang="ko">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ title }</title>
+			<link rel="stylesheet" href="/static/css/output.css"/>
+			<script src="https://unpkg.com/htmx.org@2.0.0"></script>
+			<script src="https://unpkg.com/htmx.org@2.0.0/dist/ext/ws.js"></script>
+		</head>
+		<body class="bg-gray-50">
+			<div class="flex h-screen">
+				<!-- Sidebar -->
+				@Sidebar()
+				
+				<!-- Main Content -->
+				<div class="flex-1 flex flex-col overflow-hidden">
+					<!-- Top Header -->
+					<header class="bg-white border-b border-gray-200 px-6 py-4">
+						<div class="flex items-center justify-between">
+							<div>
+								<h1 class="text-lg font-semibold text-gray-900">{ title }</h1>
+							</div>
+							<div class="flex items-center space-x-4">
+								<button class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md">
+									<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h3m-9-4h3m6 0h3"></path>
+									</svg>
+								</button>
+								<button class="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md">
+									<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 19v-2.5a3.5 3.5 0 017 0V19M4 19h16"></path>
+									</svg>
+								</button>
+							</div>
+						</div>
+					</header>
+					
+					<!-- Main Content Area -->
+					<main class="flex-1 overflow-auto p-6">
+						{ children... }
+					</main>
+				</div>
+			</div>
+		</body>
+	</html>
+}
+
+// Legacy Layout for backwards compatibility
+templ Layout(title string) {
+	@BaseLayout(title) {
+		{ children... }
+	}
 }

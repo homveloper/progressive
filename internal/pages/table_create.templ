@@ -1,0 +1,657 @@
+package pages
+
+import "progressive/internal/components"
+import "progressive/internal/models"
+
+templ TableCreatePage(templates []models.TableTemplate) {
+	@components.AppLayout("새 테이블 생성 - Progressive") {
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+			<!-- Header -->
+			<div class="mb-8">
+				<nav class="flex" aria-label="Breadcrumb">
+					<ol class="flex items-center space-x-4">
+						<li>
+							<a href="/dashboard" class="text-gray-400 hover:text-gray-500">대시보드</a>
+						</li>
+						<li class="flex items-center">
+							<svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+							</svg>
+							<span class="ml-4 text-gray-900 font-medium">새 테이블 생성</span>
+						</li>
+					</ol>
+				</nav>
+				<div class="mt-4">
+					<h1 class="text-3xl font-bold text-gray-900">새 테이블 생성</h1>
+					<p class="mt-2 text-gray-600">JSON Schema를 정의하여 구조화된 데이터 테이블을 생성하세요</p>
+				</div>
+			</div>
+
+			<!-- Main Content -->
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+				<!-- Left Column: Schema Input -->
+				<div class="space-y-6">
+					<div class="bg-white border border-gray-200 rounded-lg p-6">
+						<h2 class="text-lg font-semibold text-gray-900 mb-4">1. JSON Schema 정의</h2>
+						
+						<!-- Schema Input Methods -->
+						<div class="mb-6">
+							<div class="flex border-b border-gray-200">
+								<button id="tab-editor" class="tab-button tab-active px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-600">
+									에디터
+								</button>
+								<button id="tab-upload" class="tab-button px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+									파일 업로드
+								</button>
+								<button id="tab-template" class="tab-button px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+									템플릿
+								</button>
+							</div>
+						</div>
+
+						<!-- Tab Content: Editor -->
+						<div id="content-editor" class="tab-content">
+							<div class="mb-4">
+								<label for="table-name" class="block text-sm font-medium text-gray-700 mb-2">테이블 이름</label>
+								<input type="text" id="table-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="예: 고객 관리, 프로젝트 추적"/>
+							</div>
+							
+							<div class="mb-4">
+								<label class="block text-sm font-medium text-gray-700 mb-2">JSON Schema</label>
+								<div class="relative">
+									<textarea id="schema-editor" class="w-full h-80 px-3 py-2 border border-gray-300 rounded-md font-mono text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="JSON Schema를 입력하세요..."></textarea>
+								</div>
+							</div>
+
+							<div class="flex space-x-3">
+								<button id="validate-schema" class="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-md text-sm font-medium">
+									스키마 검증
+								</button>
+								<button id="load-example" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium">
+									예제 로드
+								</button>
+							</div>
+						</div>
+
+						<!-- Tab Content: Upload -->
+						<div id="content-upload" class="tab-content hidden">
+							<div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
+								<svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+									<path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+								<div class="mt-4">
+									<label for="file-upload" class="cursor-pointer">
+										<span class="mt-2 block text-sm font-medium text-gray-900">JSON Schema 파일을 드래그하거나 클릭하여 업로드</span>
+										<input id="file-upload" name="file-upload" type="file" class="sr-only" accept=".json,.txt"/>
+									</label>
+									<p class="mt-1 text-xs text-gray-500">JSON, TXT 파일 지원</p>
+								</div>
+							</div>
+						</div>
+
+						<!-- Tab Content: Templates -->
+						<div id="content-template" class="tab-content hidden">
+							<!-- Business Category -->
+							<div class="mb-6">
+								<h4 class="text-sm font-medium text-gray-700 mb-3 flex items-center">
+									<svg class="w-4 h-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 002 2h2a2 2 0 002-2V4h-2z"/>
+									</svg>
+									비즈니스 템플릿
+								</h4>
+								<div class="grid grid-cols-1 gap-3">
+									for _, template := range templates {
+										if template.Category == "business" {
+											<button class="template-btn p-4 border border-gray-200 rounded-lg text-left hover:border-blue-300 hover:bg-blue-50" data-template={ template.ID }>
+												<h5 class="font-medium text-gray-900">{ template.Name }</h5>
+												<p class="text-sm text-gray-500 mt-1">{ template.Description }</p>
+											</button>
+										}
+									}
+								</div>
+							</div>
+							
+							<!-- Game Category -->
+							<div class="mb-6">
+								<h4 class="text-sm font-medium text-gray-700 mb-3 flex items-center">
+									<svg class="w-4 h-4 mr-2 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+									</svg>
+									게임 템플릿
+								</h4>
+								<div class="grid grid-cols-1 gap-3">
+									for _, template := range templates {
+										if template.Category == "game" {
+											<button class="template-btn p-4 border border-gray-200 rounded-lg text-left hover:border-purple-300 hover:bg-purple-50" data-template={ template.ID }>
+												<h5 class="font-medium text-gray-900">{ template.Name }</h5>
+												<p class="text-sm text-gray-500 mt-1">{ template.Description }</p>
+											</button>
+										}
+									}
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Schema Status -->
+					<div id="schema-status" class="hidden bg-green-50 border border-green-200 rounded-lg p-4">
+						<div class="flex items-center">
+							<svg class="h-5 w-5 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+							</svg>
+							<div>
+								<h4 class="text-sm font-medium text-green-800">스키마 검증 완료</h4>
+								<p class="text-sm text-green-600 mt-1" id="schema-fields-count">필드 개수: 0개</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Right Column: Preview -->
+				<div class="space-y-6">
+					<div class="bg-white border border-gray-200 rounded-lg p-6">
+						<h2 class="text-lg font-semibold text-gray-900 mb-4">2. 테이블 미리보기</h2>
+						
+						<!-- Preview Container -->
+						<div id="table-preview" class="border border-gray-200 rounded-lg overflow-hidden">
+							<div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+								<p class="text-sm text-gray-500 text-center">스키마를 입력하면 테이블 구조가 여기에 표시됩니다</p>
+							</div>
+							<div class="p-8 text-center text-gray-400">
+								<svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0V4a1 1 0 011-1h14a1 1 0 011 1v16a1 1 0 01-1 1H5a1 1 0 01-1-1z"/>
+								</svg>
+								<p class="mt-2">테이블 미리보기</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Data Input Options -->
+					<div class="bg-white border border-gray-200 rounded-lg p-6">
+						<h2 class="text-lg font-semibold text-gray-900 mb-4">3. 초기 데이터 설정</h2>
+						
+						<div class="space-y-4">
+							<div class="flex items-center space-x-3">
+								<input id="empty-table" type="radio" name="data-option" value="empty" class="text-blue-600 focus:ring-blue-500" checked/>
+								<label for="empty-table" class="text-sm text-gray-700">빈 테이블로 시작</label>
+							</div>
+							<div class="flex items-center space-x-3">
+								<input id="sample-data" type="radio" name="data-option" value="sample" class="text-blue-600 focus:ring-blue-500"/>
+								<label for="sample-data" class="text-sm text-gray-700">샘플 데이터 포함</label>
+							</div>
+							<div class="flex items-center space-x-3">
+								<input id="import-data" type="radio" name="data-option" value="import" class="text-blue-600 focus:ring-blue-500"/>
+								<label for="import-data" class="text-sm text-gray-700">CSV/JSON 파일 가져오기</label>
+							</div>
+						</div>
+
+						<div id="import-section" class="mt-4 p-4 bg-gray-50 rounded-md hidden">
+							<label class="block text-sm font-medium text-gray-700 mb-2">데이터 파일 선택</label>
+							<input type="file" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" accept=".csv,.json"/>
+						</div>
+					</div>
+
+					<!-- Action Buttons -->
+					<div class="flex space-x-3">
+						<button id="create-table" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium disabled:bg-gray-300 disabled:cursor-not-allowed" disabled>
+							테이블 생성
+						</button>
+						<button class="px-6 py-3 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50">
+							취소
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- JavaScript for interactivity -->
+		<script>
+			// Templates data - hardcoded for now to avoid JSON parsing issues
+			const schemaTemplates = {
+				// Business templates
+				"customer": {
+					name: "고객 관리",
+					schema: {
+						type: "object",
+						properties: {
+							name: { type: "string", title: "이름", minLength: 1 },
+							email: { type: "string", format: "email", title: "이메일" },
+							company: { type: "string", title: "회사명" },
+							phone: { type: "string", title: "연락처", pattern: "^[0-9-+()\\s]+$" },
+							interest_level: { type: "string", title: "관심도", enum: ["높음", "중간", "낮음"] },
+							registration_date: { type: "string", format: "date", title: "등록일" }
+						},
+						required: ["name", "email"]
+					}
+				},
+				"project": {
+					name: "프로젝트 관리",
+					schema: {
+						type: "object",
+						properties: {
+							title: { type: "string", title: "제목", minLength: 1 },
+							description: { type: "string", title: "설명" },
+							assignee: { type: "string", title: "담당자" },
+							status: { type: "string", title: "상태", enum: ["TODO", "진행중", "완료"] },
+							priority: { type: "integer", title: "우선순위", minimum: 1, maximum: 5 },
+							due_date: { type: "string", format: "date", title: "마감일" }
+						},
+						required: ["title", "status"]
+					}
+				},
+				"inventory": {
+					name: "재고 관리",
+					schema: {
+						type: "object",
+						properties: {
+							product_name: { type: "string", title: "상품명", minLength: 1 },
+							category: { type: "string", title: "카테고리" },
+							quantity: { type: "integer", title: "수량", minimum: 0 },
+							price: { type: "number", title: "가격", minimum: 0 },
+							supplier: { type: "string", title: "공급업체" },
+							last_updated: { type: "string", format: "date-time", title: "최종 업데이트" }
+						},
+						required: ["product_name", "quantity", "price"]
+					}
+				},
+				"event": {
+					name: "이벤트 관리",
+					schema: {
+						type: "object",
+						properties: {
+							title: { type: "string", title: "제목", minLength: 1 },
+							date: { type: "string", format: "date", title: "날짜" },
+							time: { type: "string", title: "시간", pattern: "^([01]?[0-9]|2[0-3]):[0-5][0-9]$" },
+							location: { type: "string", title: "장소" },
+							attendees: { type: "integer", title: "참석자 수", minimum: 0 },
+							type: { type: "string", title: "이벤트 유형", enum: ["회의", "워크샵", "세미나", "파티", "기타"] }
+						},
+						required: ["title", "date", "time"]
+					}
+				},
+				// Game templates
+				"quest": {
+					name: "퀘스트 관리",
+					schema: {
+						type: "object",
+						properties: {
+							quest_name: { type: "string", title: "퀘스트명", minLength: 1 },
+							description: { type: "string", title: "설명" },
+							quest_type: { type: "string", title: "퀘스트 유형", enum: ["메인", "서브", "일일", "주간", "이벤트"] },
+							difficulty: { type: "string", title: "난이도", enum: ["쉬움", "보통", "어려움", "매우어려움"] },
+							level_requirement: { type: "integer", title: "필요 레벨", minimum: 1, maximum: 100 },
+							reward_exp: { type: "integer", title: "보상 경험치", minimum: 0 },
+							reward_gold: { type: "integer", title: "보상 골드", minimum: 0 },
+							reward_items: { type: "string", title: "보상 아이템" },
+							completion_condition: { type: "string", title: "완료 조건" },
+							status: { type: "string", title: "상태", enum: ["활성", "비활성", "테스트중"] }
+						},
+						required: ["quest_name", "quest_type", "difficulty", "level_requirement"]
+					}
+				},
+				"shop_item": {
+					name: "상품 관리",
+					schema: {
+						type: "object",
+						properties: {
+							item_name: { type: "string", title: "상품명", minLength: 1 },
+							description: { type: "string", title: "설명" },
+							category: { type: "string", title: "카테고리", enum: ["무기", "방어구", "소모품", "장식품", "재료", "기타"] },
+							rarity: { type: "string", title: "등급", enum: ["일반", "고급", "희귀", "영웅", "전설"] },
+							price_gold: { type: "integer", title: "골드 가격", minimum: 0 },
+							price_gem: { type: "integer", title: "보석 가격", minimum: 0 },
+							stock: { type: "integer", title: "재고", minimum: -1 },
+							level_requirement: { type: "integer", title: "필요 레벨", minimum: 1, maximum: 100 },
+							is_limited: { type: "boolean", title: "한정 상품" },
+							sale_start_date: { type: "string", format: "date", title: "판매 시작일" },
+							sale_end_date: { type: "string", format: "date", title: "판매 종료일" }
+						},
+						required: ["item_name", "category", "rarity"]
+					}
+				},
+				"game_item": {
+					name: "게임 아이템",
+					schema: {
+						type: "object",
+						properties: {
+							item_name: { type: "string", title: "아이템명", minLength: 1 },
+							description: { type: "string", title: "설명" },
+							item_type: { type: "string", title: "아이템 유형", enum: ["무기", "방어구", "악세서리", "소모품", "재료", "퀘스트", "기타"] },
+							rarity: { type: "string", title: "등급", enum: ["일반", "고급", "희귀", "영웅", "전설", "신화"] },
+							level_requirement: { type: "integer", title: "필요 레벨", minimum: 1, maximum: 100 },
+							attack_power: { type: "integer", title: "공격력", minimum: 0 },
+							defense_power: { type: "integer", title: "방어력", minimum: 0 },
+							hp_bonus: { type: "integer", title: "체력 보너스", minimum: 0 },
+							mp_bonus: { type: "integer", title: "마나 보너스", minimum: 0 },
+							special_effect: { type: "string", title: "특수 효과" },
+							durability: { type: "integer", title: "내구도", minimum: 0, maximum: 100 },
+							max_stack: { type: "integer", title: "최대 중첩", minimum: 1, maximum: 999 },
+							drop_location: { type: "string", title: "획득 장소" },
+							crafting_materials: { type: "string", title: "제작 재료" }
+						},
+						required: ["item_name", "item_type", "rarity"]
+					}
+				}
+			};
+			
+
+			// Tab functionality
+			document.addEventListener('DOMContentLoaded', function() {
+				const tabButtons = document.querySelectorAll('.tab-button');
+				const tabContents = document.querySelectorAll('.tab-content');
+				
+				tabButtons.forEach(button => {
+					button.addEventListener('click', () => {
+						const tabId = button.id.replace('tab-', '');
+						
+						// Update tab buttons
+						tabButtons.forEach(btn => {
+							btn.classList.remove('tab-active', 'border-blue-500', 'text-blue-600');
+							btn.classList.add('border-transparent', 'text-gray-500');
+						});
+						button.classList.add('tab-active', 'border-blue-500', 'text-blue-600');
+						button.classList.remove('border-transparent', 'text-gray-500');
+						
+						// Update tab content
+						tabContents.forEach(content => {
+							content.classList.add('hidden');
+						});
+						document.getElementById(`content-${tabId}`).classList.remove('hidden');
+					});
+				});
+
+				// Template selection
+				document.querySelectorAll('.template-btn').forEach(btn => {
+					btn.addEventListener('click', () => {
+						const template = btn.dataset.template;
+						const templateData = schemaTemplates[template];
+						
+						document.getElementById('table-name').value = templateData.name;
+						document.getElementById('schema-editor').value = JSON.stringify(templateData.schema, null, 2);
+						
+						// Switch to editor tab
+						document.getElementById('tab-editor').click();
+						validateSchema();
+					});
+				});
+
+				// Example schema loading
+				document.getElementById('load-example').addEventListener('click', () => {
+					// Use the first available template as example
+					const firstTemplate = Object.keys(schemaTemplates)[0];
+					if (firstTemplate) {
+						const templateData = schemaTemplates[firstTemplate];
+						document.getElementById('schema-editor').value = JSON.stringify(templateData.schema, null, 2);
+						document.getElementById('table-name').value = templateData.name;
+						validateSchema();
+					}
+				});
+
+				// Schema validation
+				document.getElementById('validate-schema').addEventListener('click', validateSchema);
+				document.getElementById('schema-editor').addEventListener('input', debounce(validateSchema, 500));
+
+				// Data options
+				document.querySelectorAll('input[name="data-option"]').forEach(radio => {
+					radio.addEventListener('change', (e) => {
+						const importSection = document.getElementById('import-section');
+						if (e.target.value === 'import') {
+							importSection.classList.remove('hidden');
+						} else {
+							importSection.classList.add('hidden');
+						}
+					});
+				});
+
+				// File upload drag and drop
+				const fileUpload = document.getElementById('file-upload');
+				const dropZone = fileUpload.parentElement.parentElement.parentElement;
+
+				['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+					dropZone.addEventListener(eventName, preventDefaults, false);
+				});
+
+				function preventDefaults(e) {
+					e.preventDefault();
+					e.stopPropagation();
+				}
+
+				['dragenter', 'dragover'].forEach(eventName => {
+					dropZone.addEventListener(eventName, highlight, false);
+				});
+
+				['dragleave', 'drop'].forEach(eventName => {
+					dropZone.addEventListener(eventName, unhighlight, false);
+				});
+
+				function highlight(e) {
+					dropZone.classList.add('border-blue-400', 'bg-blue-50');
+				}
+
+				function unhighlight(e) {
+					dropZone.classList.remove('border-blue-400', 'bg-blue-50');
+				}
+
+				dropZone.addEventListener('drop', handleDrop, false);
+
+				function handleDrop(e) {
+					const dt = e.dataTransfer;
+					const files = dt.files;
+					handleFiles(files);
+				}
+
+				fileUpload.addEventListener('change', (e) => {
+					handleFiles(e.target.files);
+				});
+
+				function handleFiles(files) {
+					if (files.length > 0) {
+						const file = files[0];
+						if (file.type === 'application/json' || file.name.endsWith('.json')) {
+							const reader = new FileReader();
+							reader.onload = (e) => {
+								try {
+									const schema = JSON.parse(e.target.result);
+									document.getElementById('schema-editor').value = JSON.stringify(schema, null, 2);
+									document.getElementById('tab-editor').click();
+									validateSchema();
+								} catch (error) {
+									alert('JSON 파일을 파싱할 수 없습니다: ' + error.message);
+								}
+							};
+							reader.readAsText(file);
+						}
+					}
+				}
+				
+				// Create table button event listener
+				document.getElementById('create-table').addEventListener('click', function() {
+					console.log('🚀 테이블 생성 버튼 클릭됨');
+					
+					const tableName = document.getElementById('table-name').value.trim();
+					const schemaText = document.getElementById('schema-editor').value.trim();
+					const dataOption = document.querySelector('input[name="data-option"]:checked')?.value || 'empty';
+					
+					console.log('📝 입력 데이터:', {
+						tableName: tableName,
+						schemaText: schemaText.substring(0, 100) + '...',
+						dataOption: dataOption
+					});
+					
+					if (!tableName || !schemaText) {
+						console.warn('⚠️ 필수 입력 값이 누락됨');
+						alert('테이블 이름과 JSON Schema를 입력해주세요.');
+						return;
+					}
+					
+					try {
+						console.log('🔍 JSON Schema 파싱 중...');
+						const schema = JSON.parse(schemaText);
+						console.log('✅ JSON Schema 파싱 성공:', schema);
+						
+						// 클라이언트 사이드에서 처리 (서버 없이)
+						const tableId = generateClientTableId(tableName);
+						console.log('🆔 생성된 테이블 ID:', tableId);
+						
+						// 로컬 스토리지에 테이블 데이터 저장
+						const tableData = {
+							id: tableId,
+							name: tableName,
+							schema: schema,
+							dataOption: dataOption,
+							createdAt: new Date().toISOString(),
+							records: []
+						};
+						
+						console.log('💾 테이블 데이터를 로컬 스토리지에 저장:', tableData);
+						localStorage.setItem(`table_${tableId}`, JSON.stringify(tableData));
+						
+						// 테이블 목록 업데이트
+						const tableList = JSON.parse(localStorage.getItem('table_list') || '[]');
+						tableList.push({
+							id: tableId,
+							name: tableName,
+							createdAt: tableData.createdAt
+						});
+						localStorage.setItem('table_list', JSON.stringify(tableList));
+						console.log('📋 테이블 목록 업데이트 완료:', tableList);
+						
+						// 테이블 편집 페이지로 이동
+						console.log('🔄 테이블 편집 페이지로 리다이렉트:', `/table/${tableId}`);
+						window.location.href = `/table/${tableId}`;
+						
+					} catch (error) {
+						console.error('❌ JSON Schema 파싱 오류:', error);
+						alert('JSON Schema 형식이 올바르지 않습니다: ' + error.message);
+					}
+				});
+				
+				// 클라이언트 사이드 테이블 ID 생성 함수
+				function generateClientTableId(name) {
+					const timestamp = Date.now();
+					const randomSuffix = Math.random().toString(36).substring(2, 8);
+					const safeName = name.replace(/[^a-zA-Z0-9가-힣]/g, '_').substring(0, 20);
+					return `${safeName}_${timestamp}_${randomSuffix}`;
+				}
+			});
+
+			function validateSchema() {
+				const schemaText = document.getElementById('schema-editor').value.trim();
+				const tableName = document.getElementById('table-name').value.trim();
+				const statusDiv = document.getElementById('schema-status');
+				const createButton = document.getElementById('create-table');
+				const preview = document.getElementById('table-preview');
+
+				if (!schemaText || !tableName) {
+					statusDiv.classList.add('hidden');
+					createButton.disabled = true;
+					return;
+				}
+
+				try {
+					const schema = JSON.parse(schemaText);
+					
+					if (schema.type === 'object' && schema.properties) {
+						const fieldCount = Object.keys(schema.properties).length;
+						
+						statusDiv.classList.remove('hidden');
+						statusDiv.classList.remove('bg-red-50', 'border-red-200');
+						statusDiv.classList.add('bg-green-50', 'border-green-200');
+						statusDiv.querySelector('h4').textContent = '스키마 검증 완료';
+						statusDiv.querySelector('h4').className = 'text-sm font-medium text-green-800';
+						statusDiv.querySelector('svg').className = 'h-5 w-5 text-green-600 mr-3';
+						document.getElementById('schema-fields-count').textContent = `필드 개수: ${fieldCount}개`;
+						
+						createButton.disabled = false;
+						updatePreview(schema, tableName);
+					} else {
+						throw new Error('스키마는 object 타입이어야 하며 properties를 포함해야 합니다.');
+					}
+				} catch (error) {
+					statusDiv.classList.remove('hidden');
+					statusDiv.classList.remove('bg-green-50', 'border-green-200');
+					statusDiv.classList.add('bg-red-50', 'border-red-200');
+					statusDiv.querySelector('h4').textContent = '스키마 오류';
+					statusDiv.querySelector('h4').className = 'text-sm font-medium text-red-800';
+					statusDiv.querySelector('svg').className = 'h-5 w-5 text-red-600 mr-3';
+					statusDiv.querySelector('svg').innerHTML = '<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>';
+					document.getElementById('schema-fields-count').textContent = error.message;
+					
+					createButton.disabled = true;
+				}
+			}
+
+			function updatePreview(schema, tableName) {
+				const preview = document.getElementById('table-preview');
+				
+				let html = `
+					<div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+						<h3 class="text-sm font-medium text-gray-900">${tableName}</h3>
+					</div>
+					<div class="overflow-x-auto">
+						<table class="min-w-full divide-y divide-gray-200">
+							<thead class="bg-gray-50">
+								<tr>
+				`;
+				
+				// Add headers
+				for (const [fieldName, fieldDef] of Object.entries(schema.properties)) {
+					const title = fieldDef.title || fieldName;
+					const required = schema.required && schema.required.includes(fieldName) ? '*' : '';
+					html += `<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${title}${required}</th>`;
+				}
+				
+				html += `
+								</tr>
+							</thead>
+							<tbody class="bg-white divide-y divide-gray-200">
+								<tr>
+				`;
+				
+				// Add sample row
+				for (const [fieldName, fieldDef] of Object.entries(schema.properties)) {
+					let sampleValue = '';
+					switch (fieldDef.type) {
+						case 'string':
+							if (fieldDef.format === 'email') sampleValue = 'example@email.com';
+							else if (fieldDef.format === 'date') sampleValue = '2024-01-01';
+							else if (fieldDef.enum) sampleValue = fieldDef.enum[0];
+							else sampleValue = '샘플 텍스트';
+							break;
+						case 'integer':
+						case 'number':
+							sampleValue = fieldDef.minimum || 1;
+							break;
+						case 'boolean':
+							sampleValue = 'true';
+							break;
+						default:
+							sampleValue = '샘플';
+					}
+					html += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sampleValue}</td>`;
+				}
+				
+				html += `
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				`;
+				
+				preview.innerHTML = html;
+			}
+
+			function debounce(func, wait) {
+				let timeout;
+				return function executedFunction(...args) {
+					const later = () => {
+						clearTimeout(timeout);
+						func(...args);
+					};
+					clearTimeout(timeout);
+					timeout = setTimeout(later, wait);
+				};
+			}
+		</script>
+	}
+}

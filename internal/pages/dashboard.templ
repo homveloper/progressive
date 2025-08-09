@@ -1,0 +1,104 @@
+package pages
+
+import "progressive/internal/components"
+
+templ Dashboard() {
+	@components.AppLayout("대시보드") {
+		<div class="space-y-6">
+			<!-- Welcome Section -->
+			<div class="bg-white p-6 rounded-lg shadow-sm">
+				<h2 class="text-xl font-semibold text-gray-900 mb-2">환영합니다! 👋</h2>
+				<p class="text-gray-600">JSON Schema 기반 테이블 에디터로 데이터를 효율적으로 관리하세요.</p>
+			</div>
+
+			<!-- Quick Actions -->
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				<a href="/table/create" class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+					<div class="flex items-center">
+						<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
+							<svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+							</svg>
+						</div>
+						<div class="ml-4">
+							<h3 class="text-lg font-medium text-gray-900">새 테이블 생성</h3>
+							<p class="text-sm text-gray-500">JSON Schema로 새 테이블을 만드세요</p>
+						</div>
+					</div>
+				</a>
+
+				<div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+					<div class="flex items-center">
+						<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100">
+							<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+							</svg>
+						</div>
+						<div class="ml-4">
+							<h3 class="text-lg font-medium text-gray-900">파일 가져오기</h3>
+							<p class="text-sm text-gray-500">CSV, JSON 파일을 업로드하세요</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+					<div class="flex items-center">
+						<div class="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100">
+							<svg class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+							</svg>
+						</div>
+						<div class="ml-4">
+							<h3 class="text-lg font-medium text-gray-900">템플릿 사용</h3>
+							<p class="text-sm text-gray-500">미리 만들어진 템플릿을 선택하세요</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Recent Tables -->
+			<div class="bg-white rounded-lg shadow-sm">
+				<div class="px-6 py-4 border-b border-gray-200">
+					<h3 class="text-lg font-medium text-gray-900">최근 작업한 테이블</h3>
+				</div>
+				<div class="p-6">
+					<div class="text-center py-12">
+						<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+						</svg>
+						<h3 class="mt-2 text-sm font-medium text-gray-900">테이블이 없습니다</h3>
+						<p class="mt-1 text-sm text-gray-500">첫 번째 테이블을 생성해 보세요!</p>
+						<div class="mt-6">
+							<a href="/table/create" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+								<svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+								</svg>
+								새 테이블 생성
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Statistics -->
+			<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+				<div class="bg-white p-6 rounded-lg shadow-sm">
+					<dt class="text-sm font-medium text-gray-500 truncate">총 테이블</dt>
+					<dd class="mt-1 text-3xl font-semibold text-gray-900">0</dd>
+				</div>
+				<div class="bg-white p-6 rounded-lg shadow-sm">
+					<dt class="text-sm font-medium text-gray-500 truncate">총 레코드</dt>
+					<dd class="mt-1 text-3xl font-semibold text-gray-900">0</dd>
+				</div>
+				<div class="bg-white p-6 rounded-lg shadow-sm">
+					<dt class="text-sm font-medium text-gray-500 truncate">이번 주 작업</dt>
+					<dd class="mt-1 text-3xl font-semibold text-gray-900">0</dd>
+				</div>
+				<div class="bg-white p-6 rounded-lg shadow-sm">
+					<dt class="text-sm font-medium text-gray-500 truncate">활성 워크스페이스</dt>
+					<dd class="mt-1 text-3xl font-semibold text-gray-900">1</dd>
+				</div>
+			</div>
+		</div>
+	}
+}
