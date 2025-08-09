@@ -1,0 +1,30 @@
+package components
+
+templ Layout(title string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ title }</title>
+			<link rel="stylesheet" href="/static/css/output.css"/>
+			<script src="https://unpkg.com/htmx.org@2.0.0"></script>
+			<script src="https://unpkg.com/htmx.org@2.0.0/dist/ext/ws.js"></script>
+		</head>
+		<body class="bg-gray-50">
+			<nav class="bg-white shadow-sm mb-8">
+				<div class="container mx-auto px-4 py-4">
+					<a href="/" class="text-2xl font-bold text-blue-600">Progressive</a>
+				</div>
+			</nav>
+			
+			<main>
+				{ children... }
+			</main>
+			
+			<footer class="mt-16 py-8 text-center text-gray-500">
+				<p>&copy; 2024 Progressive. All rights reserved.</p>
+			</footer>
+		</body>
+	</html>
+}

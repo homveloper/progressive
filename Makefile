@@ -1,58 +1,68 @@
-# Progressive Spreadsheet Makefile
+# Go + Templ + Tailwind CSS Build Pipeline
 
-.PHONY: dev build-wasm build clean deps
+.PHONY: help dev build clean tailwind-build tailwind-watch templ-generate templ-watch run air-dev
 
-# Development server with WASM build
-dev: build-wasm
-	@echo "Starting development server..."
-	go run *.go
+# Default target
+help:
+	@echo "Available targets:"
+	@echo "  dev              - Start development server with live reload (Air + Tailwind watch)"
+	@echo "  build            - Build the complete application"
+	@echo "  run              - Run the application"
+	@echo "  clean            - Clean build artifacts"
+	@echo "  tailwind-build   - Build Tailwind CSS (production)"
+	@echo "  tailwind-watch   - Watch and build Tailwind CSS (development)"
+	@echo "  templ-generate   - Generate templ files"
+	@echo "  templ-watch      - Watch and generate templ files"
+	@echo "  air-dev          - Start Air development server with live reload"
 
-# Build WebAssembly
-build-wasm:
-	@echo "Building WebAssembly..."
-	@mkdir -p web
-	GOOS=js GOARCH=wasm go build -o web/app.wasm *.go
-	@echo "WebAssembly built: web/app.wasm"
+# Development - runs everything with live reload
+dev:
+	@echo "Starting development servers..."
+	@make -j2 tailwind-watch air-dev
 
-# Build server binary
-build:
-	@echo "Building server binary..."
-	go build -o progressive *.go
-	@echo "Server binary built: progressive"
+# Air development server with live reload
+air-dev:
+	@echo "Starting Air development server..."
+	@air
 
-# Build both
-build-all: build-wasm build
+# Production build
+build: clean tailwind-build templ-generate
+	@echo "Building Go application..."
+	@go build -o ./tmp/progressive ./cmd/web
+	@echo "Build complete! Binary: ./tmp/progressive"
 
-# Install dependencies
-deps:
-	@echo "Installing dependencies..."
-	go mod tidy
-	go mod download
+# Run the Go application
+run:
+	@echo "Starting Go application..."
+	@go run ./cmd/web
 
 # Clean build artifacts
 clean:
 	@echo "Cleaning build artifacts..."
-	rm -f progressive
-	rm -f web/app.wasm
+	@rm -rf ./tmp
+	@rm -f ./static/css/output.css
+	@rm -f ./internal/pages/*_templ.go ./internal/components/*_templ.go
 
-# Copy wasm_exec.js from Go installation
-wasm-exec:
-	@echo "Copying wasm_exec.js..."
-	cp "$$(go env GOROOT)/misc/wasm/wasm_exec.js" web/
+# Tailwind CSS - Production build (minified)
+tailwind-build:
+	@echo "Building Tailwind CSS (production)..."
+	@npx @tailwindcss/cli -c ./tailwind.config.js -i ./static/css/input.css -o ./static/css/output.css
 
-# Setup project (run once)
-setup: deps wasm-exec build-wasm
-	@echo "Project setup complete!"
-	@echo "Run 'make dev' to start development server"
+# Tailwind CSS - Development watch (with live reload)
+tailwind-watch:
+	@echo "Watching Tailwind CSS files..."
+	@npx @tailwindcss/cli -c ./tailwind.config.js -i ./static/css/input.css -o ./static/css/output.css --watch
 
-# Help
-help:
-	@echo "Available commands:"
-	@echo "  dev        - Start development server"
-	@echo "  build-wasm - Build WebAssembly binary"
-	@echo "  build      - Build server binary"
-	@echo "  build-all  - Build both WebAssembly and server"
-	@echo "  deps       - Install dependencies"
-	@echo "  clean      - Clean build artifacts"
-	@echo "  setup      - Setup project (run once)"
-	@echo "  help       - Show this help"
+# Templ - Generate template files
+templ-generate:
+	@echo "Generating templ files..."
+	@templ generate
+
+# Templ - Watch and generate template files
+templ-watch:
+	@echo "Watching templ files..."
+	@templ generate --watch
+
+# Create tmp directory if it doesn't exist
+./tmp:
+	@mkdir -p ./tmp

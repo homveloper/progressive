@@ -1,0 +1,85 @@
+package pages
+
+import "progressive/internal/components"
+
+type TicTacToeData struct {
+	Board      [9]string
+	CurrentPlayer string
+	Winner     string
+	IsGameOver bool
+}
+
+templ TicTacToe(data TicTacToeData) {
+	@components.Layout("틱택톡 게임") {
+		@tictactoeContent(data)
+	}
+}
+
+templ tictactoeContent(data TicTacToeData) {
+	<div class="container mx-auto px-4 py-8">
+		<div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
+			<h1 class="text-3xl font-bold text-center mb-6 text-gray-800">틱택톡 게임</h1>
+			
+			<!-- Game Status -->
+			<div class="text-center mb-6">
+				if data.IsGameOver {
+					if data.Winner != "" {
+						<div class="text-2xl font-bold text-green-600">
+							🎉 { data.Winner }이(가) 승리했습니다!
+						</div>
+					} else {
+						<div class="text-2xl font-bold text-yellow-600">
+							🤝 무승부입니다!
+						</div>
+					}
+					<button 
+						hx-post="/tictactoe/reset" 
+						hx-target="#game-container"
+						class="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+					>
+						다시 시작
+					</button>
+				} else {
+					<div class="text-xl font-semibold text-blue-600">
+						현재 차례: { data.CurrentPlayer }
+					</div>
+				}
+			</div>
+
+			<!-- Game Board -->
+			<div id="game-container">
+				<div class="grid grid-cols-3 gap-2 max-w-xs mx-auto">
+					for i := 0; i < 9; i++ {
+						<button 
+							if !data.IsGameOver {
+								hx-post={ "/tictactoe/move/" + templ.URL(string(rune('0'+i))) }
+								hx-target="#game-container"
+							}
+							class={ 
+								"w-20 h-20 text-3xl font-bold rounded-lg border-2 transition-all",
+								templ.KV("bg-gray-100 border-gray-300 hover:bg-gray-200", data.Board[i] == "" && !data.IsGameOver),
+								templ.KV("bg-blue-100 border-blue-300 text-blue-600", data.Board[i] == "X"),
+								templ.KV("bg-red-100 border-red-300 text-red-600", data.Board[i] == "O"),
+								templ.KV("cursor-not-allowed opacity-50", data.Board[i] != "" || data.IsGameOver),
+								templ.KV("hover:shadow-md cursor-pointer", data.Board[i] == "" && !data.IsGameOver)
+							}
+							disabled?={ data.Board[i] != "" || data.IsGameOver }
+						>
+							{ data.Board[i] }
+						</button>
+					}
+				</div>
+			</div>
+
+			<!-- Game Rules -->
+			<div class="mt-8 text-sm text-gray-600 bg-gray-50 rounded-lg p-4">
+				<h3 class="font-semibold mb-2">게임 규칙:</h3>
+				<ul class="list-disc list-inside space-y-1">
+					<li>X와 O가 번갈아가며 게임을 진행합니다</li>
+					<li>가로, 세로, 대각선 중 한 줄을 먼저 만드는 플레이어가 승리합니다</li>
+					<li>9칸이 모두 찰 때까지 승부가 나지 않으면 무승부입니다</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+}
