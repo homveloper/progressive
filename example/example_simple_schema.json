@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "title": "간단한 연락처",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "이름"
+    },
+    "email": {
+      "type": "string",
+      "description": "이메일"
+    },
+    "phone": {
+      "type": "string",
+      "description": "전화번호"
+    },
+    "age": {
+      "type": "integer",
+      "description": "나이"
+    },
+    "isVIP": {
+      "type": "boolean",
+      "description": "VIP 여부"
+    }
+  },
+  "required": ["name", "email"]
+}

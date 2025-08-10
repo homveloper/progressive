@@ -1,0 +1,60 @@
+{
+  "type": "object",
+  "title": "사용자 정보",
+  "description": "사용자 프로필 정보를 저장하는 스키마",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "고유 식별자"
+    },
+    "name": {
+      "type": "string",
+      "description": "사용자 이름"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "이메일 주소"
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 120,
+      "description": "나이"
+    },
+    "phone": {
+      "type": "string",
+      "description": "전화번호"
+    },
+    "address": {
+      "type": "string",
+      "description": "주소"
+    },
+    "company": {
+      "type": "string",
+      "description": "회사명"
+    },
+    "jobTitle": {
+      "type": "string",
+      "description": "직책"
+    },
+    "salary": {
+      "type": "number",
+      "description": "연봉"
+    },
+    "isActive": {
+      "type": "boolean",
+      "description": "활성 상태"
+    },
+    "registeredAt": {
+      "type": "string",
+      "format": "date",
+      "description": "가입일"
+    },
+    "bio": {
+      "type": "string",
+      "description": "자기소개"
+    }
+  },
+  "required": ["id", "name", "email"]
+}
