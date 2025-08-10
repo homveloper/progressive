@@ -1,0 +1,51 @@
+package tableeditor
+
+// Filter and search bar component
+templ filterBar() {
+	<div class="mb-4 bg-white rounded-lg border border-gray-200 p-3">
+		<div class="flex items-center justify-between">
+			<div class="flex items-center space-x-4">
+				@searchInput()
+				@filterButton()
+				@sortButton()
+			</div>
+			
+			<div class="text-sm text-gray-600">
+				총 <span id="total-records" class="font-medium">0</span>개 레코드
+			</div>
+		</div>
+	</div>
+}
+
+templ searchInput() {
+	<div class="relative">
+		<svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+		</svg>
+		<input 
+			type="text" 
+			id="search-input"
+			placeholder="레코드 검색..." 
+			class="pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+		/>
+	</div>
+}
+
+templ filterButton() {
+	<button class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+		<svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.707A1 1 0 013 7V4z"/>
+		</svg>
+		필터
+	</button>
+}
+
+templ sortButton() {
+	<button class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+		<svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v4H8V5z"/>
+		</svg>
+		정렬
+	</button>
+}

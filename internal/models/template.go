@@ -411,12 +411,12 @@ func GetTemplateByID(id string) *TableTemplate {
 func GetTemplatesByCategory(category string) []TableTemplate {
 	templates := GetTableTemplates()
 	var filtered []TableTemplate
-	
+
 	for _, template := range templates {
 		if template.Category == category {
 			filtered = append(filtered, template)
 		}
 	}
-	
+
 	return filtered
 }

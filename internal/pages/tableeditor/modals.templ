@@ -1,0 +1,231 @@
+package tableeditor
+
+// Add record modal
+templ addRecordModal() {
+	<div id="add-record-modal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+		<div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
+			<div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+				<h3 class="text-lg font-medium text-gray-900">새 레코드 추가</h3>
+			</div>
+			
+			<div class="px-6 py-4 overflow-y-auto max-h-[60vh]">
+				<form id="add-record-form">
+					<!-- Dynamic form fields will be inserted here -->
+				</form>
+			</div>
+			
+			<div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+				<button 
+					type="button" 
+					onclick="closeAddRecordModal()"
+					class="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+				>
+					취소
+				</button>
+				<button 
+					type="button" 
+					onclick="submitNewRecord()"
+					class="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+				>
+					추가
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+// Edit cell modal
+templ editCellModal() {
+	<div id="edit-cell-modal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+		<div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4">
+			<div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+				<h3 class="text-lg font-medium text-gray-900">셀 편집</h3>
+			</div>
+			
+			<div class="px-6 py-4">
+				<label class="block text-sm font-medium text-gray-700 mb-2" id="edit-cell-label">
+					값 편집
+				</label>
+				<div id="edit-cell-input-container">
+					<!-- Dynamic input will be inserted here -->
+				</div>
+			</div>
+			
+			<div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+				<button 
+					type="button" 
+					onclick="closeEditCellModal()"
+					class="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+				>
+					취소
+				</button>
+				<button 
+					type="button" 
+					onclick="saveEditedCell()"
+					class="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+				>
+					저장
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+// Export modal
+templ exportModal() {
+	<div id="export-modal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+		<div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+			<div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+				<h3 class="text-lg font-medium text-gray-900">데이터 내보내기</h3>
+			</div>
+			
+			<div class="px-6 py-4">
+				<p class="text-sm text-gray-600 mb-4">
+					내보낼 형식을 선택하세요:
+				</p>
+				
+				<div class="space-y-2">
+					@exportOption("json", "JSON", "JavaScript Object Notation")
+					@exportOption("csv", "CSV", "Comma-Separated Values")
+					@exportOption("excel", "Excel", "Microsoft Excel (XLSX)")
+				</div>
+			</div>
+			
+			<div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end">
+				<button 
+					type="button" 
+					onclick="closeExportModal()"
+					class="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+				>
+					닫기
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+// Import modal
+templ importModal() {
+	<div id="import-modal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+		<div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
+			<div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+				<h3 class="text-lg font-medium text-gray-900">데이터 가져오기</h3>
+			</div>
+			
+			<div class="px-6 py-4 overflow-y-auto max-h-[60vh]">
+				<!-- File Upload Section -->
+				<div class="mb-6">
+					<label class="block text-sm font-medium text-gray-700 mb-2">
+						파일 선택
+					</label>
+					<div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+						<input type="file" id="import-file-input" accept=".csv,.json" class="hidden" />
+						<div id="file-drop-zone" class="cursor-pointer">
+							<svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+							</svg>
+							<p class="text-sm text-gray-600">
+								<span class="font-medium text-blue-600 hover:text-blue-500">파일을 선택하거나</span> 
+								여기에 드래그하여 업로드
+							</p>
+							<p class="text-xs text-gray-500 mt-2">
+								CSV 또는 JSON 파일만 지원됩니다 (최대 10MB)
+							</p>
+						</div>
+						
+						<!-- Selected file display -->
+						<div id="selected-file-info" class="hidden mt-4 p-3 bg-blue-50 rounded border border-blue-200">
+							<div class="flex items-center">
+								<svg class="w-5 h-5 text-blue-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+								</svg>
+								<div>
+									<div id="selected-file-name" class="text-sm font-medium text-blue-900"></div>
+									<div id="selected-file-size" class="text-xs text-blue-600"></div>
+								</div>
+								<button id="remove-file-btn" class="ml-auto text-blue-400 hover:text-blue-600">
+									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+									</svg>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Import Options -->
+				<div class="mb-6">
+					<label class="block text-sm font-medium text-gray-700 mb-3">
+						가져오기 옵션
+					</label>
+					<div class="space-y-3">
+						<label class="flex items-center">
+							<input type="radio" name="import-mode" value="replace" checked class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
+							<span class="ml-2 text-sm text-gray-700">기존 데이터 전체 교체</span>
+						</label>
+						<label class="flex items-center">
+							<input type="radio" name="import-mode" value="append" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" />
+							<span class="ml-2 text-sm text-gray-700">기존 데이터에 추가</span>
+						</label>
+					</div>
+				</div>
+
+				<!-- Preview Section -->
+				<div id="import-preview" class="hidden">
+					<h4 class="text-sm font-medium text-gray-900 mb-3">미리보기 (처음 5행)</h4>
+					<div class="border rounded-lg overflow-hidden">
+						<div id="import-preview-content" class="max-h-64 overflow-auto">
+							<!-- Preview content will be inserted here -->
+						</div>
+					</div>
+					<div class="mt-2 text-xs text-gray-500">
+						총 <span id="import-total-rows">0</span>행이 감지되었습니다.
+					</div>
+				</div>
+
+				<!-- Error Messages -->
+				<div id="import-error" class="hidden mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+					<div class="flex">
+						<svg class="w-5 h-5 text-red-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+						</svg>
+						<div>
+							<h3 class="text-sm font-medium text-red-800">가져오기 오류</h3>
+							<div id="import-error-message" class="text-sm text-red-700 mt-1"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+				<button 
+					type="button" 
+					onclick="closeImportModal()"
+					class="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+				>
+					취소
+				</button>
+				<button 
+					type="button" 
+					onclick="processImport()"
+					id="import-submit-btn"
+					disabled
+					class="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+				>
+					가져오기
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+// Export option button
+templ exportOption(format string, label string, description string) {
+	<button 
+		class="export-option w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+		data-format={ format }
+	>
+		<div class="font-medium text-gray-900">{ label }</div>
+		<div class="text-sm text-gray-500">{ description }</div>
+	</button>
+}

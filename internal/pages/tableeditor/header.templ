@@ -1,0 +1,27 @@
+package tableeditor
+
+// Editor header with breadcrumb and title
+templ editorHeader() {
+	<div class="mb-6">
+		<nav class="flex" aria-label="Breadcrumb">
+			<ol class="flex items-center space-x-4">
+				<li>
+					<a href="/dashboard" class="text-gray-400 hover:text-gray-500">대시보드</a>
+				</li>
+				<li class="flex items-center">
+					<svg class="flex-shrink-0 h-5 w-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+						<path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+					</svg>
+					<span class="ml-4 text-gray-900 font-medium">테이블 편집</span>
+				</li>
+			</ol>
+		</nav>
+		
+		<div class="mt-4">
+			<div>
+				<h1 class="text-2xl font-bold text-gray-900" id="table-title">테이블 편집기</h1>
+				<p class="mt-1 text-sm text-gray-600">JSON Schema 기반 구조화된 데이터 편집</p>
+			</div>
+		</div>
+	</div>
+}

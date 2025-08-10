@@ -52,8 +52,19 @@ templ TableCreatePage(templates []models.TableTemplate) {
 						<!-- Tab Content: Editor -->
 						<div id="content-editor" class="tab-content">
 							<div class="mb-4">
-								<label for="table-name" class="block text-sm font-medium text-gray-700 mb-2">테이블 이름</label>
-								<input type="text" id="table-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="예: 고객 관리, 프로젝트 추적"/>
+								<label for="table-name" class="block text-sm font-medium text-gray-700 mb-2">
+									테이블 이름 
+									<span class="text-xs text-gray-500">(영어, 숫자, 언더스코어만 사용)</span>
+								</label>
+								<input 
+									type="text" 
+									id="table-name" 
+									class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" 
+									placeholder="예: customer_management, project_tracker"
+									pattern="[a-zA-Z0-9_]+"
+									title="영어, 숫자, 언더스코어(_)만 사용 가능합니다"
+								/>
+								<p class="text-xs text-gray-500 mt-1">영어로 작성해주세요. 띄어쓰기 대신 언더스코어(_)를 사용하세요.</p>
 							</div>
 							
 							<div class="mb-4">
@@ -210,7 +221,7 @@ templ TableCreatePage(templates []models.TableTemplate) {
 			const schemaTemplates = {
 				// Business templates
 				"customer": {
-					name: "고객 관리",
+					name: "customer_management",
 					schema: {
 						type: "object",
 						properties: {
@@ -225,7 +236,7 @@ templ TableCreatePage(templates []models.TableTemplate) {
 					}
 				},
 				"project": {
-					name: "프로젝트 관리",
+					name: "project_management",
 					schema: {
 						type: "object",
 						properties: {
@@ -240,7 +251,7 @@ templ TableCreatePage(templates []models.TableTemplate) {
 					}
 				},
 				"inventory": {
-					name: "재고 관리",
+					name: "inventory_management",
 					schema: {
 						type: "object",
 						properties: {
@@ -255,7 +266,7 @@ templ TableCreatePage(templates []models.TableTemplate) {
 					}
 				},
 				"event": {
-					name: "이벤트 관리",
+					name: "event_management",
 					schema: {
 						type: "object",
 						properties: {
@@ -271,7 +282,7 @@ templ TableCreatePage(templates []models.TableTemplate) {
 				},
 				// Game templates
 				"quest": {
-					name: "퀘스트 관리",
+					name: "quest_management",
 					schema: {
 						type: "object",
 						properties: {
@@ -290,7 +301,7 @@ templ TableCreatePage(templates []models.TableTemplate) {
 					}
 				},
 				"shop_item": {
-					name: "상품 관리",
+					name: "shop_item_management",
 					schema: {
 						type: "object",
 						properties: {
@@ -310,7 +321,7 @@ templ TableCreatePage(templates []models.TableTemplate) {
 					}
 				},
 				"game_item": {
-					name: "게임 아이템",
+					name: "game_item_management",
 					schema: {
 						type: "object",
 						properties: {
@@ -484,41 +495,56 @@ templ TableCreatePage(templates []models.TableTemplate) {
 						return;
 					}
 					
+					// Validate table name format
+					const tableNamePattern = /^[a-zA-Z0-9_]+$/;
+					if (!tableNamePattern.test(tableName)) {
+						alert('테이블 이름은 영어, 숫자, 언더스코어(_)만 사용할 수 있습니다.\n띄어쓰기나 특수문자는 사용할 수 없습니다.');
+						return;
+					}
+					
 					try {
 						console.log('🔍 JSON Schema 파싱 중...');
 						const schema = JSON.parse(schemaText);
 						console.log('✅ JSON Schema 파싱 성공:', schema);
 						
-						// 클라이언트 사이드에서 처리 (서버 없이)
-						const tableId = generateClientTableId(tableName);
-						console.log('🆔 생성된 테이블 ID:', tableId);
-						
-						// 로컬 스토리지에 테이블 데이터 저장
-						const tableData = {
-							id: tableId,
-							name: tableName,
-							schema: schema,
-							dataOption: dataOption,
-							createdAt: new Date().toISOString(),
-							records: []
+						// 서버 API로 테이블 생성 요청
+						const requestData = {
+							table_name: tableName,
+							schema: schemaText,
+							data_option: dataOption
 						};
 						
-						console.log('💾 테이블 데이터를 로컬 스토리지에 저장:', tableData);
-						localStorage.setItem(`table_${tableId}`, JSON.stringify(tableData));
+						// Debug: Log JSON data being sent
+						console.log('📤 Sending JSON data:', requestData);
 						
-						// 테이블 목록 업데이트
-						const tableList = JSON.parse(localStorage.getItem('table_list') || '[]');
-						tableList.push({
-							id: tableId,
-							name: tableName,
-							createdAt: tableData.createdAt
+						console.log('🌐 서버로 테이블 생성 요청 전송 중...');
+						fetch('/api/table/create', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify(requestData)
+						})
+						.then(response => {
+							console.log('📡 서버 응답 받음:', response.status);
+							if (!response.ok) {
+								throw new Error(`서버 오류: ${response.status}`);
+							}
+							return response.json();
+						})
+						.then(data => {
+							console.log('✅ 테이블 생성 성공:', data);
+							if (data.success && data.redirect) {
+								console.log('🔄 테이블 편집 페이지로 리다이렉트:', data.redirect);
+								window.location.href = data.redirect;
+							} else {
+								throw new Error('서버 응답에 오류가 있습니다.');
+							}
+						})
+						.catch(error => {
+							console.error('❌ 테이블 생성 오류:', error);
+							alert('테이블 생성 중 오류가 발생했습니다: ' + error.message);
 						});
-						localStorage.setItem('table_list', JSON.stringify(tableList));
-						console.log('📋 테이블 목록 업데이트 완료:', tableList);
-						
-						// 테이블 편집 페이지로 이동
-						console.log('🔄 테이블 편집 페이지로 리다이렉트:', `/table/${tableId}`);
-						window.location.href = `/table/${tableId}`;
 						
 					} catch (error) {
 						console.error('❌ JSON Schema 파싱 오류:', error);
@@ -526,13 +552,6 @@ templ TableCreatePage(templates []models.TableTemplate) {
 					}
 				});
 				
-				// 클라이언트 사이드 테이블 ID 생성 함수
-				function generateClientTableId(name) {
-					const timestamp = Date.now();
-					const randomSuffix = Math.random().toString(36).substring(2, 8);
-					const safeName = name.replace(/[^a-zA-Z0-9가-힣]/g, '_').substring(0, 20);
-					return `${safeName}_${timestamp}_${randomSuffix}`;
-				}
 			});
 
 			function validateSchema() {

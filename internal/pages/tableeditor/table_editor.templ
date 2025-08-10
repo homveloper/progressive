@@ -1,0 +1,28 @@
+package tableeditor
+
+import (
+	"progressive/internal/components"
+)
+
+// Main table editor page
+templ TableEditorPage() {
+	@components.AppLayout("테이블 편집기 - Progressive") {
+		<div class="h-full px-4 sm:px-6 lg:px-8 py-6 flex flex-col">
+			@editorHeader()
+			@filterBar()
+			@dataGrid()
+		</div>
+		
+		// Floating menu
+		@floatingMenu()
+		
+		// Modals
+		@addRecordModal()
+		@editCellModal()
+		@exportModal()
+		@importModal()
+		
+		// JavaScript
+		<script src="/static/js/table-editor.js"></script>
+	}
+}
