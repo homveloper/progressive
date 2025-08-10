@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Schema Whiteboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        html, body { margin: 0; padding: 0; overflow: hidden; }
+        body { background-color: #f4f7f9; display: flex; flex-direction: column; }
+        #canvas-container { flex-grow: 1; position: relative; overflow: auto; cursor: default; }
+        #canvas-container.panning { cursor: grab; }
+        #canvas { position: relative; width: 100%; height: 100%; background-image: radial-gradient(#dce3ea 1px, transparent 1px); background-size: 20px 20px; padding: 2rem; }
+        .schema-node { background-color: white; border: 1px solid #dce3ea; border-radius: 8px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05); padding: 1rem; width: 300px; position: absolute; transition: all 0.3s ease; user-select: none; cursor: pointer; }
+        .schema-node:hover { border-color: #3b82f6; }
+        .node-title { font-weight: 600; color: #1e293b; padding-bottom: 0.5rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .property { padding: 0.5rem 0; display: flex; justify-content: space-between; align-items: center; }
+        .property-name { font-weight: 500; color: #334155; }
+        .property-type { font-family: monospace; background-color: #f1f5f9; color: #64748b; padding: 0.25rem 0.5rem; border-radius: 4px; }
+        #connector-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        #toolbar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: white; padding: 0.75rem; border-radius: 9999px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 0.5rem; z-index: 10; }
+        .toolbar-button { cursor: pointer; padding: 0.5rem 1rem; border-radius: 9999px; transition: background-color 0.2s ease; }
+        .toolbar-button:hover { background-color: #f1f5f9; }
+        .toolbar-button.active { background-color: #e0f2fe; color: #0284c7; }
+        #edit-panel { position: fixed; top: 0; right: -400px; width: 400px; height: 100%; background-color: white; box-shadow: -10px 0 25px rgba(0,0,0,0.1); z-index: 20; transition: right 0.3s ease; padding: 2rem; overflow-y: auto; }
+        #edit-panel.show { right: 0; }
+        .form-label { display: block; font-weight: 500; margin-bottom: 0.5rem; }
+        .form-input { display: block; width: 100%; padding: 0.5rem; border: 1px solid #dce3ea; border-radius: 4px; margin-bottom: 1rem; }
+        .type-specific-fields { border-top: 1px solid #e2e8f0; margin-top: 1rem; padding-top: 1rem; }
+    </style>
+</head>
+<body class="font-sans">
+
+    <div id="canvas-container">
+        <div id="canvas"></div>
+    </div>
+
+    <div id="toolbar">
+        <label for="schema-file-input" class="toolbar-button">Import Schema</label>
+        <input type="file" id="schema-file-input" class="hidden" onchange="loadSchema(event)"/>
+        <button id="pan-mode-btn" class="toolbar-button" onclick="togglePanMode()">Pan</button>
+    </div>
+
+    <div id="edit-panel">
+        <h2 class="text-2xl font-bold mb-6">Edit Node</h2>
+        <form id="edit-form">
+            <input type="hidden" id="edit-node-path">
+            <div>
+                <label class="form-label" for="edit-title">Title</label>
+                <input type="text" id="edit-title" class="form-input">
+            </div>
+            <div>
+                <label class="form-label" for="edit-description">Description</label>
+                <textarea id="edit-description" class="form-input" rows="3"></textarea>
+            </div>
+            <div>
+                <label class="form-label" for="edit-type">Type</label>
+                <select id="edit-type" class="form-input" onchange="toggleTypeSpecificFields()">
+                    <option value="string">string</option>
+                    <option value="number">number</option>
+                    <option value="integer">integer</option>
+                    <option value="object">object</option>
+                    <option value="array">array</option>
+                    <option value="boolean">boolean</option>
+                </select>
+            </div>
+
+            <div id="string-fields" class="type-specific-fields hidden"></div>
+            <div id="number-fields" class="type-specific-fields hidden"></div>
+            <div id="object-fields" class="type-specific-fields hidden">
+                <h3 class="font-semibold mb-2">Properties</h3>
+                <div id="properties-list"></div>
+                <button type="button" onclick="addProperty()" class="mt-2 px-4 py-2 bg-green-500 text-white rounded-lg">Add Property</button>
+            </div>
+
+            <div class="flex justify-end gap-4 mt-6">
+                <button type="button" onclick="hideEditPanel()" class="px-4 py-2 bg-gray-200 rounded-lg">Cancel</button>
+                <button type="button" onclick="saveEdit()" class="px-4 py-2 bg-blue-500 text-white rounded-lg">Save</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // ... (Keep all existing variables and panning logic) ...
+        const editTitleInput = document.getElementById('edit-title');
+        const editTypeInput = document.getElementById('edit-type');
+        const propertiesList = document.getElementById('properties-list');
+
+        function showEditPanel(path) {
+            const nodeSchema = getNodeSchema(path);
+            if (!nodeSchema) return;
+            editNodePathInput.value = JSON.stringify(path);
+            
+            editTitleInput.value = nodeSchema.title || '';
+            editDescriptionInput.value = nodeSchema.description || '';
+            editTypeInput.value = nodeSchema.type || 'string';
+
+            toggleTypeSpecificFields();
+            editPanel.classList.add('show');
+        }
+
+        function toggleTypeSpecificFields() {
+            const selectedType = editTypeInput.value;
+            document.getElementById('string-fields').classList.toggle('hidden', selectedType !== 'string');
+            document.getElementById('number-fields').classList.toggle('hidden', selectedType !== 'number' && selectedType !== 'integer');
+            const objectFields = document.getElementById('object-fields');
+            objectFields.classList.toggle('hidden', selectedType !== 'object');
+            if(selectedType === 'object') {
+                renderPropertiesList();
+            }
+        }
+
+        function renderPropertiesList() {
+            const path = JSON.parse(editNodePathInput.value);
+            const nodeSchema = getNodeSchema(path);
+            propertiesList.innerHTML = '';
+            if (nodeSchema && nodeSchema.properties) {
+                for (const key in nodeSchema.properties) {
+                    const propEl = document.createElement('div');
+                    propEl.className = 'flex items-center justify-between p-2 bg-gray-50 rounded mb-2';
+                    propEl.innerHTML = `<span>${key}</span><button type="button" onclick="removeProperty('${key}')" class="px-2 py-1 bg-red-500 text-white rounded">Remove</button>`;
+                    propertiesList.appendChild(propEl);
+                }
+            }
+        }
+
+        function addProperty() {
+            const newPropName = prompt("Enter new property name:");
+            if (newPropName) {
+                const path = JSON.parse(editNodePathInput.value);
+                const nodeSchema = getNodeSchema(path);
+                if (nodeSchema && nodeSchema.type === 'object') {
+                    if (!nodeSchema.properties) {
+                        nodeSchema.properties = {};
+                    }
+                    nodeSchema.properties[newPropName] = { type: 'string', description: '' };
+                    renderPropertiesList();
+                    renderWhiteboard(mainSchema);
+                }
+            }
+        }
+
+        function removeProperty(propName) {
+            const path = JSON.parse(editNodePathInput.value);
+            const nodeSchema = getNodeSchema(path);
+            if (nodeSchema && nodeSchema.properties && nodeSchema.properties[propName]) {
+                delete nodeSchema.properties[propName];
+                renderPropertiesList();
+                renderWhiteboard(mainSchema);
+            }
+        }
+
+        function saveEdit() {
+            const path = JSON.parse(editNodePathInput.value);
+            const nodeSchema = getNodeSchema(path);
+            if (!nodeSchema) return;
+
+            nodeSchema.title = document.getElementById('edit-title').value;
+            nodeSchema.description = document.getElementById('edit-description').value;
+            const newType = document.getElementById('edit-type').value;
+            if (nodeSchema.type !== newType) {
+                nodeSchema.type = newType;
+                // When changing type, we might want to clear old properties
+                if (newType !== 'object') delete nodeSchema.properties;
+                if (newType !== 'array') delete nodeSchema.items;
+            }
+
+            hideEditPanel();
+            renderWhiteboard(mainSchema);
+        }
+
+        // ... (Keep the rest of the JS code) ...
+        const canvasContainer = document.getElementById('canvas-container');
+        const canvas = document.getElementById('canvas');
+        const panBtn = document.getElementById('pan-mode-btn');
+        const editPanel = document.getElementById('edit-panel');
+        const editForm = document.getElementById('edit-form');
+        const editNodePathInput = document.getElementById('edit-node-path');
+        const editDescriptionInput = document.getElementById('edit-description');
+
+        let mainSchema = {};
+        let nodePositions = {};
+        let isPanning = false;
+        let startX, startY, scrollLeft, scrollTop;
+
+        // Panning Logic
+        function togglePanMode() { canvasContainer.classList.toggle('panning'); panBtn.classList.toggle('active'); }
+        canvasContainer.addEventListener('mousedown', (e) => { if (!canvasContainer.classList.contains('panning')) return; isPanning = true; startX = e.pageX - canvasContainer.offsetLeft; startY = e.pageY - canvasContainer.offsetTop; scrollLeft = canvasContainer.scrollLeft; scrollTop = canvasContainer.scrollTop; canvasContainer.style.cursor = 'grabbing'; });
+        canvasContainer.addEventListener('mouseleave', () => { isPanning = false; });
+        canvasContainer.addEventListener('mouseup', () => { isPanning = false; if (canvasContainer.classList.contains('panning')) { canvasContainer.style.cursor = 'grab'; } });
+        canvasContainer.addEventListener('mousemove', (e) => { if (!isPanning) return; e.preventDefault(); const x = e.pageX - canvasContainer.offsetLeft; const y = e.pageY - canvasContainer.offsetTop; const walkX = (x - startX) * 2; const walkY = (y - startY) * 2; canvasContainer.scrollLeft = scrollLeft - walkX; canvasContainer.scrollTop = scrollTop - walkY; });
+
+        function loadSchema(event) {
+            const input = event.target;
+            if (input.files.length === 0) return;
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    mainSchema = JSON.parse(e.target.result);
+                    renderWhiteboard(mainSchema);
+                } catch (error) { alert('Error parsing JSON file: ' + error.message); }
+            };
+            reader.readAsText(file);
+        }
+
+        function renderWhiteboard(schema) {
+            canvas.innerHTML = '<svg id="connector-svg"></svg>';
+            nodePositions = {};
+            const connections = [];
+            renderNode(schema, schema.title || 'Root', [], 0, connections);
+            layoutNodes();
+            setTimeout(() => drawConnections(connections), 100);
+        }
+
+        function renderNode(schema, name, path, level, connections) {
+            const nodeId = (path.length > 0 ? path.join('-') : 'Root').replace(/[\.\s]/g, '-');
+            nodePositions[nodeId] = { level, index: path.length > 0 ? path[path.length-1] : 0 };
+
+            const node = document.createElement('div');
+            node.className = 'schema-node';
+            node.id = nodeId;
+            node.onclick = (e) => { e.stopPropagation(); showEditPanel(path); };
+
+            const type = schema.type || 'any';
+            node.innerHTML = `<div class="node-title"><span>${name}</span><span class="property-type">${type}</span></div><p class="text-sm text-gray-500 mb-2">${schema.description || ''}</p>`;
+
+            if (type === 'object' && schema.properties) {
+                Object.keys(schema.properties).forEach((key, i) => {
+                    const prop = schema.properties[key];
+                    const propId = `${nodeId}-${key}`;
+                    const propEl = document.createElement('div');
+                    propEl.className = 'property';
+                    propEl.id = propId;
+                    propEl.innerHTML = `<span class="property-name">${key}</span><span class="property-type">${prop.type || 'any'}</span>`;
+                    node.appendChild(propEl);
+                    if (prop.type === 'object' || prop.type === 'array') {
+                        const childNodeId = renderNode(prop, prop.title || key, [...path, 'properties', key], level + 1, connections);
+                        connections.push({ from: propId, to: childNodeId });
+                    }
+                });
+            } else if (type === 'array' && schema.items) {
+                const propId = `${nodeId}-items`;
+                const propEl = document.createElement('div');
+                propEl.className = 'property';
+                propEl.id = propId;
+                propEl.innerHTML = `<span class="property-name">items</span><span class="property-type">${schema.items.type || 'any'}</span>`;
+                node.appendChild(propEl);
+                if (schema.items.type === 'object' || schema.items.type === 'array') {
+                    const childNodeId = renderNode(schema.items, schema.items.title || `${name}_items`, [...path, 'items'], level + 1, connections);
+                    connections.push({ from: propId, to: childNodeId });
+                }
+            }
+            canvas.appendChild(node);
+            return nodeId;
+        }
+
+        function getNodeSchema(path) {
+            let current = mainSchema;
+            for (const key of path) {
+                if (current[key] === undefined) return null;
+                current = current[key];
+            }
+            return current;
+        }
+
+        function hideEditPanel() {
+            editPanel.classList.remove('show');
+        }
+
+        function layoutNodes() {
+            const levels = {};
+            for (const nodeId in nodePositions) {
+                const pos = nodePositions[nodeId];
+                if (!levels[pos.level]) levels[pos.level] = [];
+                levels[pos.level].push(nodeId);
+            }
+
+            const levelKeys = Object.keys(levels).sort((a, b) => a - b);
+            let maxCanvasHeight = 0;
+            let currentX = 50;
+
+            levelKeys.forEach(level => {
+                const nodes = levels[level];
+                let currentY = 50;
+                let maxNodeWidth = 0;
+
+                nodes.forEach(nodeId => {
+                    const el = document.getElementById(nodeId);
+                    if (el) {
+                        el.style.left = `${currentX}px`;
+                        el.style.top = `${currentY}px`;
+                        currentY += el.offsetHeight + 50;
+                        if (currentY > maxCanvasHeight) maxCanvasHeight = currentY;
+                        if (el.offsetWidth > maxNodeWidth) maxNodeWidth = el.offsetWidth;
+                    }
+                });
+                currentX += maxNodeWidth + 100;
+            });
+
+            canvas.style.width = `${currentX}px`;
+            canvas.style.height = `${maxCanvasHeight}px`;
+        }
+
+        function drawConnections(connections) {
+            const svg = document.getElementById('connector-svg');
+            if(!svg) return;
+            svg.innerHTML = '';
+            svg.style.width = canvas.scrollWidth + 'px';
+            svg.style.height = canvas.scrollHeight + 'px';
+
+            connections.forEach(conn => {
+                const fromEl = document.getElementById(conn.from);
+                const toEl = document.getElementById(conn.to);
+
+                if (fromEl && toEl) {
+                    const fromRect = fromEl.getBoundingClientRect();
+                    const toRect = toEl.getBoundingClientRect();
+                    const canvasContainerRect = canvasContainer.getBoundingClientRect();
+
+                    const startX = fromRect.right - canvasContainerRect.left + canvasContainer.scrollLeft;
+                    const startY = fromRect.top - canvasContainerRect.top + fromRect.height / 2 + canvasContainer.scrollTop;
+                    const endX = toRect.left - canvasContainerRect.left + canvasContainer.scrollLeft;
+                    const endY = toRect.top - canvasContainerRect.top + toRect.height / 2 + canvasContainer.scrollTop;
+
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    const d = `M ${startX} ${startY} C ${startX + 60} ${startY}, ${endX - 60} ${endY}, ${endX} ${endY}`;
+                    path.setAttribute('d', d);
+                    path.setAttribute('stroke', '#94a3b8');
+                    path.setAttribute('stroke-width', '2');
+                    path.setAttribute('fill', 'none');
+                    svg.appendChild(path);
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
